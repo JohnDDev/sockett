@@ -20,6 +20,7 @@ const listen = (app) => {
             console.log('disconnected', socket.id);
 
             // await sdCasinoEnd(memberIdx);
+            await sdCasinoEnd();
         });
     });
 
