@@ -19,8 +19,23 @@ const listen = (app) => {
         socket.on('disconnect', async () => {
             console.log('disconnected', socket.id);
 
-            // await sdCasinoEnd(memberIdx);
-            await sdCasinoEnd();
+            const usercode = socket.handshake?.headers?.usercode;
+
+            if (!usercode) {
+                console.log('No usercode found.');
+                return false;
+            }
+
+            const userSockets = await getUserSockets(io, usercode);
+
+            if (userSockets.length > 0) {
+                console.log('There is still existing socket connected to usercode:', usercode);
+                return false;
+            }
+            
+            console.log('run socket', userSockets.length, userSockets);
+            await sdCasinoEnd(usercode);
+            return;
         });
     });
 
@@ -28,5 +43,14 @@ const listen = (app) => {
         console.log('Connection Error', err);
     });
 };
+
+const getUserSockets = async (io, usercode) => {
+    const allSockets = await io.fetchSockets();
+    const userSockets = allSockets.filter((item) => {
+        return item.handshake?.headers?.usercode === usercode;
+    });
+
+    return userSockets;
+}
 
 module.exports = { listen };
