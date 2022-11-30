@@ -19,7 +19,7 @@ const listen = (app) => {
         socket.on('disconnect', async () => {
             console.log('disconnected', socket.id);
 
-            const usercode = socket.handshake?.headers?.usercode;
+            const usercode = socket.handshake?.query?.usercode;
 
             if (!usercode) {
                 console.log('No usercode found.');
@@ -47,7 +47,7 @@ const listen = (app) => {
 const getUserSockets = async (io, usercode) => {
     const allSockets = await io.fetchSockets();
     const userSockets = allSockets.filter((item) => {
-        return item.handshake?.headers?.usercode === usercode;
+        return item.handshake?.query?.usercode === usercode;
     });
 
     return userSockets;
